@@ -2,10 +2,13 @@ name: Django CI
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - development
+      - main
   pull_request:
-    branches: [ main ]
-
+    branches: 
+      - development 
+      - main
 jobs:
   build:
 
@@ -32,3 +35,5 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test
+        
+        
