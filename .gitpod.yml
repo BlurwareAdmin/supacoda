@@ -1,0 +1,23 @@
+image:
+  file: .gitpod.Dockerfile
+tasks:
+  - before: "echo 'export PIP_USER=no' >> ~/.bashrc && export PIP_USER=no"
+    name: Use Pulumi
+    command: pulumi version
+  - before: "echo 'export PIP_USER=no' >> ~/.bashrc && export PIP_USER=no"
+    name: Install Python Requirements
+    init: pip install -r requirements.txt
+  - before: "echo 'export PIP_USER=no' >> ~/.bashrc && export PIP_USER=no"
+    name: Use Azure 
+    init: brew install azure-cli
+
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: true
+    addComment: true
+    addBadge: false
