@@ -32,4 +32,4 @@ jobs:
     - name: Build the Docker Image
       run: docker build . --file Dockerfile --tag supacoda:development
     - name: Publish the Docker Image 
-    - run: docker push ${{ secrets.DOCKER_USERNAME }}/supacoda:development
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/supacoda:development
