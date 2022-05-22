@@ -28,4 +28,4 @@ jobs:
         # Log out from the Docker registry at the end of a job
         logout: true
     - name: Build & Publish the Docker Image
-      run: docker build . --file Dockerfile --tag supacoda:latest & docker push ${{ secrets.DOCKER_USERNAME }}/supacoda
+      run: docker build . --file Dockerfile --tag supacoda:latest & docker push harleydev/supacoda
