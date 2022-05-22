@@ -29,6 +29,7 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         # Log out from the Docker registry at the end of a job
         logout: true
-    - name: Build the Docker image
+    - name: Build the Docker Image
       run: docker build . --file Dockerfile --tag supacoda:development
-    - name: docker push ${{ secrets.DOCKER_USERNAME }}/supacoda:development
+    - name: Publish the Docker Image 
+    - run: docker push ${{ secrets.DOCKER_USERNAME }}/supacoda:development
