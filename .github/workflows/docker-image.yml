@@ -31,4 +31,4 @@ jobs:
         logout: true
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag supacoda:development
-    - name: docker push ${{ secrets.DockerPassword }}/supacoda:development
+    - name: docker push ${{ secrets.DockerUserName }}/supacoda:development
