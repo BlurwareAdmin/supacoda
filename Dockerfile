@@ -1,4 +1,4 @@
-FROM python:3.9-buster
+FROM python:3.11-rc-slim-buster
 
 RUN apt-get update && apt-get install nginx vim -y --no-install-recommends
 COPY nginx.default /etc/nginx/sites-available/default
