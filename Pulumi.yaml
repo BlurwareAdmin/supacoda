@@ -1,0 +1,4 @@
+name: az-container-app
+runtime:
+  name: python
+description: Creates an Azure Container App and deploys a custom Docker image to it
