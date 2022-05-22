@@ -22,13 +22,13 @@ jobs:
       uses: docker/login-action@v2.0.0
       with:
         # Server address of Docker registry. If not set then will default to Docker Hub
-        registry: ${{ secrets.ImageRegistry }}
+        registry: ${{ secrets.IMAGE_REGISTRY  }}
         # Username used to log against the Docker registry
-        username: ${{ secrets.DockerUserName }}
+        username: ${{ secrets.DOCKER_USERNAME }}
         # Password or personal access token used to log against the Docker registry
-        password: ${{ secrets.DockerPassword }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
         # Log out from the Docker registry at the end of a job
         logout: true
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag supacoda:development
-    - name: docker push ${{ secrets.DockerUserName }}/supacoda:development
+    - name: docker push ${{ secrets.DOCKER_USERNAME }}/supacoda:development
