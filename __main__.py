@@ -40,10 +40,10 @@ credentials = pulumi.Output.all(resource_group.name, registry.name).apply(
 admin_username = credentials.username
 admin_password = credentials.passwords[0]["value"]
 
-custom_image = "node-app"
+custom_image = "supacoda"
 my_image = docker.Image(custom_image,
     image_name=registry.login_server.apply(
-        lambda login_server: f"{login_server}/{custom_image}:v1.0.0"),
+        lambda login_server: f"{login_server}/{custom_image}:latest"),
     build=docker.DockerBuild(context=f"./{custom_image}"),
     registry=docker.ImageRegistry(
         server=registry.login_server,
