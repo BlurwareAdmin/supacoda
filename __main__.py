@@ -41,14 +41,7 @@ admin_username = credentials.username
 admin_password = credentials.passwords[0]["value"]
 
 custom_image = "supacoda"
-my_image = docker.Image(custom_image,
-    image_name=registry.login_server.apply(
-        lambda login_server: f"{login_server}/{custom_image}:latest"),
-    build=docker.DockerBuild(context=f"./{custom_image}"),
-    registry=docker.ImageRegistry(
-        server=registry.login_server,
-        username=admin_username,
-        password=admin_password))
+my_image =  docker.RemoteImage(custom_image, name=f"custom_image:latest")
 
 container_app = web.ContainerApp("app",
     resource_group_name=resource_group.name,
