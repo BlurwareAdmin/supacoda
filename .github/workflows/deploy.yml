@@ -27,6 +27,7 @@ jobs:
         pip install -r requirements.txt
     - name: Set Pulumi 
       run: |
+        pulumi stack select blurware/az-container-app/az-container-app
         pulumi config set azure-native:clientId ${{ secrets.AZUZRE_CLIENT_ID }} 
         pulumi config set azure-native:clientSecret ${{ secrets.AZURE_CLIENT_SECRET }} --secret 
         pulumi config set azure-native:tenantId ${{ secrets.TENANT_ID }} 
@@ -42,4 +43,6 @@ jobs:
         work-dir: ./
       env: 
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}    
+          
+
           
