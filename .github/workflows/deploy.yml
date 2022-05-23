@@ -14,7 +14,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  Deploy:
+  Preview:
     runs-on: ubuntu-latest
     steps:
     
@@ -29,5 +29,8 @@ jobs:
         stack-name: az-container-app
       env: 
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-        
+        AZURE_CLIENT_ID: ${{ secrets.AZUZRE_CLIENT_ID }}
+        AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        AZURE_TENANT_ID: ${{ secrets.TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}       
           
