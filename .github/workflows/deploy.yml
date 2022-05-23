@@ -27,10 +27,10 @@ jobs:
         pip install -r requirements.txt
     - name: Preview
       run: |
-        az account list --query '[].{subscriptionName:name,subscriptionId:id}' -o tsv
+        az account list --query '[].{subscriptionName:name,subscriptionId:id}' 
         pulumi stack select ${{ secrets.PULUMI_STACK_NAME }} 
         pulumi config set azure-native:clientId ${{ secrets.AZUZRE_CLIENT_ID }} 
-        pulumi config set azure-native:clientSecret ${{ secrets.AZURE_CLIENT_SECRET }} --secret 
+        pulumi config set azure-native:clientSecret ${{ secrets.AZURE_SECRET_ID }} --secret 
         pulumi config set azure-native:tenantId ${{ secrets.TENANT_ID }} 
         pulumi config set azure-native:subscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         pulumi preview
