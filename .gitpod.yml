@@ -10,6 +10,9 @@ tasks:
   - before: "echo 'export PIP_USER=no' >> ~/.bashrc && export PIP_USER=no"
     name: Use Azure 
     init: brew install azure-cli
+  - before: "echo 'export PIP_USER=no' >> ~/.bashrc && export PIP_USER=no"
+    name: Use GH 
+    init: brew install gh
 
 
 github:
