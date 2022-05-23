@@ -26,7 +26,7 @@ jobs:
       with:
         # Pulumi command to run, eg. up
         command: preview 
-        stack-name: az-container-app
+        stack-name: blurware/az-container-app/az-container-app
       env: 
         PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         AZURE_CLIENT_ID: ${{ secrets.AZUZRE_CLIENT_ID }}
