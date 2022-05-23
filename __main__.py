@@ -1,11 +1,13 @@
-# Copyright 2016-2021, Pulumi Corporation.  All rights reserved.
+# Copyright 2022-2026, Blurware, LLC.  All rights reserved.
 
 import pulumi
 from pulumi_azure_native import containerregistry
 from pulumi_azure_native import operationalinsights
 from pulumi_azure_native import resources
-import pulumi_azure_native.web.v20210301 as web
+from pulumi_azure_native import web
 import pulumi_docker as docker
+import os 
+import pulumi_azure as azure
 
 resource_group = resources.ResourceGroup("rg")
 
@@ -20,61 +22,52 @@ workspace_shared_keys = pulumi.Output.all(resource_group.name, workspace.name) \
         workspace_name=args[1]
     ))
 
-kube_env = web.KubeEnvironment("env",
+kube_env = azure.containerservice.KubernetesCluster("kubeevn",
+    location=resource_group.location,
     resource_group_name=resource_group.name,
-    app_logs_configuration=web.AppLogsConfigurationArgs(
-        destination="log-analytics",
-        log_analytics_configuration=web.LogAnalyticsConfigurationArgs(
-            customer_id=workspace.customer_id,
-            shared_key=workspace_shared_keys.apply(lambda r: r.primary_shared_key)
-    )))
+    dns_prefix="exampleaks1",
+    default_node_pool=azure.containerservice.KubernetesClusterDefaultNodePoolArgs(
+        name="default",
+        node_count=1,
+        vm_size="Standard_D2_v2",
+    ),
+    identity=azure.containerservice.KubernetesClusterIdentityArgs(
+        type="SystemAssigned",
+    ),
+    tags={
+        "Environment": "Dev",
+    })
 
-registry = containerregistry.Registry("registry",
-    resource_group_name=resource_group.name,
-    sku=containerregistry.SkuArgs(name="Basic"),
-    admin_user_enabled=True)
 
-credentials = pulumi.Output.all(resource_group.name, registry.name).apply(
-    lambda args: containerregistry.list_registry_credentials(resource_group_name=args[0],
-                                                             registry_name=args[1]))
-admin_username = credentials.username
-admin_password = credentials.passwords[0]["value"]
-
-custom_image = "supa-coda"
-my_image = docker.Image(custom_image,
-    image_name=registry.login_server.apply(
-        lambda login_server: f"{login_server}/{custom_image}:latest"),
-    build=docker.DockerBuild(context=f"./{custom_image}"),
-    registry=docker.ImageRegistry(
-        server=registry.login_server,
-        username=admin_username,
-        password=admin_password))
-
-container_app = web.ContainerApp("app",
-    resource_group_name=resource_group.name,
-    kube_environment_id=kube_env.id,
+container_app = web.ContainerApp("containerApp",
     configuration=web.ConfigurationArgs(
         ingress=web.IngressArgs(
             external=True,
-            target_port=80
+            target_port=3000,
         ),
-        registries=[
-            web.RegistryCredentialsArgs(
-                server=registry.login_server,
-                username=admin_username,
-                password_secret_ref="pwd")
-        ],
-        secrets=[
-            web.SecretArgs(
-                name="pwd",
-                value=admin_password)
-        ],
     ),
+    kind="containerApp",
+    kube_environment_id=kube_env.id,
+    location="East US",
+    name="supacoda",
+    resource_group_name=resource_group.name,
     template=web.TemplateArgs(
-        containers = [
-            web.ContainerArgs(
-                name="myapp",
-                image=my_image.image_name)
-        ]))
-
+        containers=[web.ContainerArgs(
+            image=f"{os.getenv('DOCKERHUB_USERNAME')}/supacoda:latest",
+            name="supacoda",
+        )],
+        scale=web.ScaleArgs(
+            max_replicas=5,
+            min_replicas=1,
+            rules=[web.ScaleRuleArgs(
+                custom=web.CustomScaleRuleArgs(
+                    metadata={
+                        "concurrentRequests": "50",
+                    },
+                    type="http",
+                ),
+                name="httpscalingrule",
+            )],
+        ),
+    ))
 pulumi.export("url", container_app.configuration.apply(lambda c: c.ingress).apply(lambda i: i.fqdn))
