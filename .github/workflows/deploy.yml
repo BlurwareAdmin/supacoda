@@ -23,7 +23,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - uses: actions/checkout@v3
     - run:  |
-        pip install - r requirements.txt
+        pip install -r requirements.txt
     - uses: pulumi/actions@v3
       with:
         # Pulumi command to run, eg. up
