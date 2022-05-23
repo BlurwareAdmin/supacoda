@@ -15,7 +15,7 @@ tasks:
     init: brew install gh
   - before: "echo 'export PIP_USER=no' >> ~/.bashrc && export PIP_USER=no" 
     name: Run Doppler 
-    init: brew install gnupg & brew install dopplerhq/cli/doppler
+    init: curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sudo sh
 
 
 github:
