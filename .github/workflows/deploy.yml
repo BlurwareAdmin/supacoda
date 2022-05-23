@@ -31,7 +31,7 @@ jobs:
         pulumi stack select ${{ secrets.PULUMI_STACK_NAME }} 
         pulumi config set azure-native:clientId ${{ secrets.AZUZRE_CLIENT_ID }} 
         pulumi config set azure-native:clientSecret ${{ secrets.AZURE_SECRET_ID }} --secret 
-        pulumi config set azure-native:tenantId ${{ secrets.TENANT_ID }} 
+        pulumi config set azure-native:tenantId ${{ secrets.AZURE_TENANT_ID }} 
         pulumi config set azure-native:subscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         pulumi preview
       env: 
