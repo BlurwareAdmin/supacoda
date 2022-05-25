@@ -65,7 +65,7 @@ container_app = web.ContainerApp("containerApp",
         ),
     ),
     kind="containerApp",
-    kube_environment_id=kube_env.id,
+    kube_environment_id=managed_environment.id,
     location="East US",
     name="supacoda",
     resource_group_name=resource_group.name,
@@ -89,4 +89,3 @@ container_app = web.ContainerApp("containerApp",
         ),
     ))
 pulumi.export("url", container_app.configuration.apply(lambda c: c.ingress).apply(lambda i: i.fqdn))
-'''

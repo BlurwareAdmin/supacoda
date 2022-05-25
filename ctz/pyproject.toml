@@ -16,6 +16,9 @@ azure-mgmt-resource = "^21.1.0"
 azure-mgmt-storage = "^20.0.0"
 cookiecutter = "^1.7.3"
 docker = "^5.0.3"
+pulumi = "^3.33.1"
+azure-mgmt-authorization = "^2.0.0"
+pulumi-azure-native = "^1.64.1"
 
 
 [tool.poetry.dev-dependencies]

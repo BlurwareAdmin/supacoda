@@ -1,5 +1,6 @@
 """
 # Copyright 2022-2026, Blurware, LLC.  All rights reserved.
+
 CTZ is a developer tool for container development with python. 
 """
 
@@ -7,11 +8,30 @@ import os
 import subprocess
 
 #Third-Party Imports 
-from azure.identity._credentials.azure_cli import AzureCliCredential
 from azure.identity import DefaultAzureCredential
+from azure.mgmt.resource import ResourceManagementClient
 import typer
 import pulumi
-from pulumi import automation as auto
+
+
+def stamp_azure_client():
+    """
+    Creates a stamp client to perform actions against the azure api
+    Reads env variables. Use ARM_XXXX. If ARM env found it will map them 
+    to AZURE_XXX. 
+
+    Rec: Use a secrets manager that can inject without the use of env, json, yaml, etc..  
+    I prefer doppler or other secret management solutions like azure key vault but any should work. 
+    Auth for Python SDK: https://docs.microsoft.com/en-us/python/api/overview/azure/resources?view=azure-python
+    Doppler CLI: https://docs.doppler.com/docs/cli
+    """
+    os.environ['AZURE_TENANT_ID'] = os.environ.get('ARM_TENANT_ID', None) 
+    os.environ['AZURE_CLIENT_ID'] = os.environ.get('ARM_CLIENT_ID', None)
+    os.environ['AZURE_CLIENT_SECRET'] = os.environ.get('ARM_CLIENT_SECRET', None)
+    subscription_id = os.environ['AZURE_SUBSCRIPTION_ID'] = os.environ.get("ARM_SUBSCRIPTION_ID", None)
+    credentials = DefaultAzureCredential()
+    client = ResourceManagementClient(credentials, subscription_id)
+    return client
 
 app = typer.Typer()
 
@@ -31,7 +51,11 @@ def init(
     subprocess.Popen(['git', 'clone', template])
     subprocess.Popen(['mv', 'supacoda/', container_name])
 
-def login():
+def login(): 
+    if not check_login(): 
+        subprocess.run( ['az', 'login', '--use-device-code'])
+
+def check_login():
     user_meta = subprocess.run(
         [
         'az',
@@ -42,13 +66,12 @@ def login():
         capture_output=True, text=True
     ) 
     if user_meta.stdout is not None: 
-        typer.echo("You are already logged in!")
+       return True
     else: 
-        try: 
-            typer.echo("You will need to sign in to continue. Default is device login. For Trusted Local Development Only.")
-            subprocess.run( ['az', 'login', '--use-device-code'])
-        except: 
-            typer.echo('Login Failed.') 
+        return False
+
+
+
 
 @app.command(help="Authenitcate with azure for developmet with ctz.")
 def az_auth():
@@ -60,45 +83,23 @@ def az_auth():
     except Exception as e: 
         return e
 
-def prep_containerapps():
-    login()
-    
-    # 
-    out = subprocess.run(
-        [
-        'az' , 'extension', 'add' , 
-        '--name', 'containerapp', 
-        '--upgrade']
-    )
-    out = subprocess.run(
-        [
-        'az' ,'provider' ,'register' ,
-        '--namespace' ,'Microsoft.OperationalInsights'
-        ]
-    )
-    check_env = [
-        'RESOURCE_GROUP', 'LOCATION', 'CONTAINERAPPS_ENVIRONMENT'
-    ]
-    checks = [
-        os.getenv(x) is not None for x in check_env
-    ]
-    if False in checks:
-        print(checks)
-        typer.Abort()
-    else: 
-        # Create the resource g
-        out = subprocess.Popen([
-            'az', 'group',  'create' ,
-            '--name' ,f"{os.getenv('RESOURCE_GROUP')}", 
-            '--location' , f"{os.getenv('LOCATION')}"
-        ])
-        env = subprocess.Popen(
-        ['az', 'containerapp', 'env', 'create' ,
-            '--name' , f"{os.getenv('CONTAINERAPPS_ENVIRONMENT')}",
-            '--resource-group', f"{os.getenv('RESOURCE_GROUP')}", 
-            '--location', f"{os.getenv('LOCATION')}"
-        ])
-        print(out)
+@app.command(help="Enable Required Container APIs")
+def enable_apis(name: str = "", all: bool = False ):
+    resource_client = stamp_azure_client()
+    if all:
+        result_list = resource_client.providers.list()
+        for provider in result_list:
+            resource_client.providers.register(provider.namespace)
+            break
+    elif name:
+         resource_client.providers.register(name)
+         typer.echo(f"{name} enabled" )
+
+@app.command(help="Install Extensions")
+def isntall_extension(name: str = ""):
+     subprocess.run([
+         'az' , 'extension' ,'add' ,'--name', f'{name}' ,'--upgrade'
+         ], stdout=subprocess.DEVNULL)
 
 @app.command(help="Deploy a container to docker hub and az container apps.")
 def deploy(
@@ -122,3 +123,4 @@ def run(container_repo_url: str):
 
 if __name__ == "__main__":
     app()
+
