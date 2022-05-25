@@ -5,6 +5,7 @@ from pulumi_azure_native import containerregistry
 from pulumi_azure_native import operationalinsights
 from pulumi_azure_native import resources
 from pulumi_azure_native import web
+from pulumi_azure_native import app as pulumi_app
 import pulumi_docker as docker
 import os 
 import pulumi_azure as azure
@@ -22,6 +23,23 @@ workspace_shared_keys = pulumi.Output.all(resource_group.name, workspace.name) \
         workspace_name=args[1]
     ))
 
+# Standup Managed KubeEnvironment
+managed_environment = pulumi_app.ManagedEnvironment("managedEnvironment",
+    app_logs_configuration=pulumi_app.AppLogsConfigurationArgs(
+        log_analytics_configuration=pulumi_app.LogAnalyticsConfigurationArgs(
+            customer_id=workspace.customer_id, 
+            shared_key=workspace_shared_keys.apply(lambda r: r.primary_shared_key)
+        ),
+        destination="log-analytics"
+    ),
+    dapr_ai_connection_string="InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://northcentralus-0.in.applicationinsights.azure.com/",
+    location="East US",
+    name="testcontainerenv",
+    resource_group_name=resource_group.name,
+    zone_redundant=False)
+
+"""
+# Backup Stand up AKS Cluster and managege ArcConfirguration for more control over the cluster. 
 kube_env = azure.containerservice.KubernetesCluster("kubeevn",
     location=resource_group.location,
     resource_group_name=resource_group.name,
@@ -37,7 +55,7 @@ kube_env = azure.containerservice.KubernetesCluster("kubeevn",
     tags={
         "Environment": "Dev",
     })
-
+"""
 
 container_app = web.ContainerApp("containerApp",
     configuration=web.ConfigurationArgs(
@@ -71,3 +89,4 @@ container_app = web.ContainerApp("containerApp",
         ),
     ))
 pulumi.export("url", container_app.configuration.apply(lambda c: c.ingress).apply(lambda i: i.fqdn))
+'''

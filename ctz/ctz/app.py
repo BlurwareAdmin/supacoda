@@ -10,7 +10,8 @@ import subprocess
 from azure.identity._credentials.azure_cli import AzureCliCredential
 from azure.identity import DefaultAzureCredential
 import typer
-
+import pulumi
+from pulumi import automation as auto
 
 app = typer.Typer()
 
@@ -61,6 +62,8 @@ def az_auth():
 
 def prep_containerapps():
     login()
+    
+    # 
     out = subprocess.run(
         [
         'az' , 'extension', 'add' , 
@@ -83,6 +86,7 @@ def prep_containerapps():
         print(checks)
         typer.Abort()
     else: 
+        # Create the resource g
         out = subprocess.Popen([
             'az', 'group',  'create' ,
             '--name' ,f"{os.getenv('RESOURCE_GROUP')}", 
