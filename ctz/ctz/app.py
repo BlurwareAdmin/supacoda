@@ -80,6 +80,7 @@ def az_auth():
     """
     try: 
         login()
+        print("Logged in")
     except Exception as e: 
         return e
 
