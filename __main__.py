@@ -59,30 +59,17 @@ kube_env = azure.containerservice.KubernetesCluster("kubeevn",
 """
 
 
-container_app = azure_native.app.ContainerApp("containerApp",
-    configuration=azure_native.app.ConfigurationArgs(
-        dapr=azure_native.app.DaprArgs(
-            app_port=3000,
+container_app = app.ContainerApp("containerApp",
+    configuration=app.ConfigurationArgs(
+        dapr=app.DaprArgs(
+            app_port=8020,
             app_protocol="http",
             enabled=True,
         ),
-        ingress=azure_native.app.IngressArgs(
-
-            custom_domains=[
-                azure_native.app.CustomDomainArgs(
-                    binding_type="SniEnabled",
-                    certificate_id="/subscriptions/34adfa4f-cedf-4dc0-ba29-b6d1a69ab345/resourceGroups/rg/providers/Microsoft.App/managedEnvironments/demokube/certificates/my-certificate-for-my-name-dot-com",
-                    name="www.my-name.com",
-                ),
-                azure_native.app.CustomDomainArgs(
-                    binding_type="SniEnabled",
-                    certificate_id="/subscriptions/34adfa4f-cedf-4dc0-ba29-b6d1a69ab345/resourceGroups/rg/providers/Microsoft.App/managedEnvironments/demokube/certificates/my-certificate-for-my-other-name-dot-com",
-                    name="www.my-other-name.com",
-                ),
-            ],
+        ingress=app.IngressArgs(
             external=True,
-            target_port=3000,
-            traffic=[azure_native.app.TrafficWeightArgs(
+            target_port=8020,
+            traffic=[app.TrafficWeightArgs(
                 label="production",
                 revision_name="testcontainerApp0-ab1234",
                 weight=100,
@@ -91,31 +78,31 @@ container_app = azure_native.app.ContainerApp("containerApp",
     ),
     location="East US",
     managed_environment_id=managed_environment.id,
-    name="testcontainerApp0",
-    resource_group_name="rg",
-    template=azure_native.app.TemplateArgs(
-        containers=[azure_native.app.ContainerArgs(
-            image="repo/testcontainerApp0:v1",
-            name="testcontainerApp0",
-            probes=[azure_native.app.ContainerAppProbeArgs(
-                http_get=azure_native.app.ContainerAppProbeHttpGetArgs(
-                    http_headers=[azure_native.app.ContainerAppProbeHttpHeadersArgs(
+    name="supacoda",
+    resource_group_name=resource_group.name,
+    template=app.TemplateArgs(
+        containers=[app.ContainerArgs(
+            image="harleydev/supacoda:latest",
+            name="supacoda",
+            probes=[app.ContainerAppProbeArgs(
+                http_get=app.ContainerAppProbeHttpGetArgs(
+                    http_headers=[app.ContainerAppProbeHttpHeadersArgs(
                         name="Custom-Header",
                         value="Awesome",
                     )],
                     path="/health",
-                    port=8080,
+                    port=8020,
                 ),
                 initial_delay_seconds=3,
                 period_seconds=3,
                 type="liveness",
             )],
         )],
-        scale=azure_native.app.ScaleArgs(
+        scale=app.ScaleArgs(
             max_replicas=5,
             min_replicas=1,
-            rules=[azure_native.app.ScaleRuleArgs(
-                custom=azure_native.app.CustomScaleRuleArgs(
+            rules=[app.ScaleRuleArgs(
+                custom=app.CustomScaleRuleArgs(
                     metadata={
                         "concurrentRequests": "50",
                     },
