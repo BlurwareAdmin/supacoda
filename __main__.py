@@ -2,7 +2,6 @@
 import os
 import pulumi
 import pulumi_azure_native as azure_native
-import pulumi_docker as docker
 import pulumi_azure as azure
 
 resource_group = azure_native.resources.ResourceGroup("rg")
@@ -34,7 +33,7 @@ managed_environment = azure_native.app.ManagedEnvironment("managedEnvironment",
     zone_redundant=False)
 
 
-container_app = azure_native.app.ContainerApp("containerApp",
+container_app = azure_native.app.ContainerApp("supacoda",
     resource_group_name=resource_group.name,
     managed_environment_id=managed_environment.id, 
     configuration=azure_native.app.ConfigurationArgs(
