@@ -4,9 +4,9 @@ name: CD
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [  development, development-pulumi ]
+    branches: [  development ]
   pull_request:
-    branches: [ main, development, development-pulumi ]
+    branches: [ main, development ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
         az account list --query '[].{subscriptionName:name,subscriptionId:id}' 
         pulumi stack select ${{ secrets.PULUMI_STACK_NAME }} 
         pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
-        pulumi config set azure-native:clientSecret ${{ secrets.ARM_SECRET_ID }} --secret 
+        pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
         pulumi config set azure-native:tenantId ${{ secrets.ARM_TENANT_ID }} 
         pulumi config set azure-native:subscriptionId ${{ secrets.ARM_SUBSCRIPTION_ID }}
         pulumi config set azure-native:location eastus
