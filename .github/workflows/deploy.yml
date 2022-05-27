@@ -23,9 +23,7 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'
-      - run: pip install -r requirements.txt
-      - name: Preview
-        run: |
+      - run: |
           pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}${{ steps.date.outputs.date }} 
           pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
           pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
