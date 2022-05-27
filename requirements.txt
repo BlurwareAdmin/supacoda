@@ -75,6 +75,7 @@ protobuf==3.20.1
 psutil==5.9.0
 ptyprocess==0.7.0
 pulumi==3.33.1
+pulumi-azure==5.7.0
 pulumi-azure-native==1.64.1
 pulumi-kubernetes==3.19.1
 pure-eval==0.2.2
