@@ -27,9 +27,12 @@ jobs:
           TAG_NAME: nightly-tag-${{ steps.date.outputs.date }}
           RELEASE_NAME: nightly-release-${{ steps.date.outputs.date }}
       - uses: actions/checkout@v3
-      - name: Install Python Requirements
-        run: |
-          pip install -r requirements.txt
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - run: pip test
       - name: Preview
         run: |
           pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}${{ steps.date.outputs.date }} 
