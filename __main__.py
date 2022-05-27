@@ -1,80 +1,64 @@
-# Copyright 2016-2021, Pulumi Corporation.  All rights reserved.
-
+# Copyright 2022, Blurware, LLC.  All rights reserved.
+import os
 import pulumi
-from pulumi_azure_native import containerregistry
-from pulumi_azure_native import operationalinsights
-from pulumi_azure_native import resources
-import pulumi_azure_native.web.v20210301 as web
-import pulumi_docker as docker
+import pulumi_azure_native as azure_native
+import pulumi_azure as azure
 
-resource_group = resources.ResourceGroup("rg")
+resource_group = azure_native.resources.ResourceGroup("rg")
 
-workspace = operationalinsights.Workspace("loganalytics",
+workspace = azure_native.operationalinsights.Workspace("loganalytics",
     resource_group_name=resource_group.name,
-    sku=operationalinsights.WorkspaceSkuArgs(name="PerGB2018"),
+    sku=azure_native.operationalinsights.WorkspaceSkuArgs(name="PerGB2018"),
     retention_in_days=30)
 
 workspace_shared_keys = pulumi.Output.all(resource_group.name, workspace.name) \
-    .apply(lambda args: operationalinsights.get_shared_keys(
+    .apply(lambda args: azure_native.operationalinsights.get_shared_keys(
         resource_group_name=args[0],
         workspace_name=args[1]
     ))
 
-kube_env = web.KubeEnvironment("env",
-    resource_group_name=resource_group.name,
-    app_logs_configuration=web.AppLogsConfigurationArgs(
-        destination="log-analytics",
-        log_analytics_configuration=web.LogAnalyticsConfigurationArgs(
-            customer_id=workspace.customer_id,
+# Standup Managed KubeEnvironment
+managed_environment = azure_native.app.ManagedEnvironment("managedEnvironment",
+    app_logs_configuration=azure_native.app.AppLogsConfigurationArgs(
+        log_analytics_configuration=azure_native.app.LogAnalyticsConfigurationArgs(
+            customer_id=workspace.customer_id, 
             shared_key=workspace_shared_keys.apply(lambda r: r.primary_shared_key)
-    )))
-
-registry = containerregistry.Registry("registry",
-    resource_group_name=resource_group.name,
-    sku=containerregistry.SkuArgs(name="Basic"),
-    admin_user_enabled=True)
-
-credentials = pulumi.Output.all(resource_group.name, registry.name).apply(
-    lambda args: containerregistry.list_registry_credentials(resource_group_name=args[0],
-                                                             registry_name=args[1]))
-admin_username = credentials.username
-admin_password = credentials.passwords[0]["value"]
-
-custom_image = "supacoda"
-my_image = docker.Image(custom_image,
-    image_name=registry.login_server.apply(
-        lambda login_server: f"{login_server}/{custom_image}:latest"),
-    build=docker.DockerBuild(context=f"./{custom_image}"),
-    registry=docker.ImageRegistry(
-        server=registry.login_server,
-        username=admin_username,
-        password=admin_password))
-
-container_app = web.ContainerApp("app",
-    resource_group_name=resource_group.name,
-    kube_environment_id=kube_env.id,
-    configuration=web.ConfigurationArgs(
-        ingress=web.IngressArgs(
-            external=True,
-            target_port=80
         ),
-        registries=[
-            web.RegistryCredentialsArgs(
-                server=registry.login_server,
-                username=admin_username,
-                password_secret_ref="pwd")
-        ],
-        secrets=[
-            web.SecretArgs(
-                name="pwd",
-                value=admin_password)
-        ],
+        destination="log-analytics"
     ),
-    template=web.TemplateArgs(
-        containers = [
-            web.ContainerArgs(
-                name="myapp",
-                image=my_image.image_name)
-        ]))
+    dapr_ai_connection_string="InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://northcentralus-0.in.applicationinsights.azure.com/",
+    location="East US",
+    name="testcontainerenv",
+    resource_group_name=resource_group.name,
+    zone_redundant=False)
 
+
+container_app = azure_native.app.ContainerApp("supacoda",
+    resource_group_name=resource_group.name,
+    managed_environment_id=managed_environment.id, 
+    configuration=azure_native.app.ConfigurationArgs(
+        ingress=azure_native.app.IngressArgs(
+            external=True,
+            target_port=8020),
+        registries=[azure_native.app.RegistryCredentialsArgs(
+            server="docker.io", 
+            username="harleydev", 
+            password_secret_ref="pass"
+         )], 
+         secrets= [azure_native.app.SecretArgs(
+            name="pass", 
+            value=os.getenv('DOCKERHUB_TOKEN')
+         )]
+    ), 
+    template=azure_native.app.TemplateArgs(
+            containers=[azure_native.app.ContainerArgs(
+                name="supacoda",
+                image="harleydev/supacoda:latest"
+            )]
+        )
+    
+)
 pulumi.export("url", container_app.configuration.apply(lambda c: c.ingress).apply(lambda i: i.fqdn))
+
+# https://www.pulumi.com/blog/azure-container-apps/
+# https://www.pulumi.com/registry/packages/azure-native/api-docs/app/containerapp/

@@ -4,4 +4,5 @@
 
 # Set Your Repository Secrets
 
-# Go to your url
+# Follow the set of instructions here . 
+https://docs.microsoft.com/en-us/azure/container-apps/microservices-dapr?tabs=bash 

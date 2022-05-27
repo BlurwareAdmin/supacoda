@@ -1,0 +1,15 @@
+# Changes here will be overwritten by Copier; do NOT edit manually
+_commit: v0.4.3
+_src_path: gh:copier-org/autopretty
+ansible: false
+biggest_kbs: 0
+commitizen: false
+github: true
+js: true
+main_branches:
+- main
+nix: false
+poetry_local_hooks: true
+python: true
+terraform: false
+
