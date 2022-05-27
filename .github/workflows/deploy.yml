@@ -23,16 +23,16 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'
-          run: pip install -r requirements.txt
-      - run: |
-          pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}${{ steps.date.outputs.date }} 
-          pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
-          pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
-          pulumi config set azure-native:tenantId ${{ secrets.ARM_TENANT_ID }} 
-          pulumi config set azure-native:subscriptionId ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          pulumi config set azure-native:location eastus
-          pulumi preview
-          pulumi up --yes
+          run: |
+            pip install -r requirements.txt
+            pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}${{ steps.date.outputs.date }} 
+            pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
+            pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
+            pulumi config set azure-native:tenantId ${{ secrets.ARM_TENANT_ID }} 
+            pulumi config set azure-native:subscriptionId ${{ secrets.ARM_SUBSCRIPTION_ID }}
+            pulumi config set azure-native:location eastus
+            pulumi preview
+            pulumi up --yes
         env: 
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           
