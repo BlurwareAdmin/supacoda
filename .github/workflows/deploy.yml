@@ -33,6 +33,8 @@ jobs:
           pulumi config set azure-native:location eastus
           pulumi preview
           pulumi up --yes
+        env: 
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - run: pulumi destroy 
         env: 
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
