@@ -1,6 +1,6 @@
 # Deploy Frontend Landing Page using Azure Container Services
 
-# Create a Service Principle 
+# Create a App Registration 
 
 # Set Your Repository Secrets
 
