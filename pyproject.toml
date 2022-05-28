@@ -12,6 +12,7 @@ pulumi-azure-native = "^1.64.1"
 typer = "^0.4.1"
 azure-identity = "^1.10.0"
 azure-mgmt-resource = "^21.1.0"
+Django = "^4.0.4"
 
 [tool.poetry.dev-dependencies]
 
