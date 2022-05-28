@@ -43,10 +43,10 @@ container_app = azure_native.app.ContainerApp("supacoda",
         registries=[azure_native.app.RegistryCredentialsArgs(
             server="docker.io", 
             username="harleydev", 
-            password_secret_ref="dockerToken"
+            password_secret_ref="docker-token"
          )], 
          secrets= [azure_native.app.SecretArgs(
-            name="dockerToken", 
+            name="docker-token", 
             value=os.getenv('DOCKERHUB_TOKEN')
          )]
     ), 
