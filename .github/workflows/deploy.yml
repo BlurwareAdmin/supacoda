@@ -31,8 +31,8 @@ jobs:
           poetry run pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
           poetry run pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
           poetry run pulumi config set azure-native:tenantId ${{ secrets.ARM_TENANT_ID }} 
-          poetry pulumi config set azure-native:subscriptionId ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          poetry pulumi config set azure-native:location eastus
+          poetry run pulumi config set azure-native:subscriptionId ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          poetry run pulumi config set azure-native:location eastus
           poetry run pulumi preview
           poetry run pulumi up --yes
         env: 
