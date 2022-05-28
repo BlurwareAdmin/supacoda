@@ -27,9 +27,9 @@ jobs:
           cache: 'poetry'
       - run: poetry install
       - run: |
-          try: 
-            pulumi stack select ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}
-          except: 
+          try: \
+            pulumi stack select ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }} \
+          except: \
             pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}
           pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
           pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
