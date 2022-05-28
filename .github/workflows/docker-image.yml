@@ -1,6 +1,11 @@
 name: Docker Image CI
 
 on:
+  push:
+    branches: 
+     - main
+     - development
+     - development-azure
   pull_request:
     branches: 
      - main
