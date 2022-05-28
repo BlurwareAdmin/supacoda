@@ -1,14 +1,10 @@
 name: Docker Image CI
 
+# Controls when the workflow will run
 on:
-  push:
-    branches: 
-     - development
-     - development-azure
+  # Triggers the workflow on pull request events but only for the main branch
   pull_request:
-    branches: 
-     - development
-     - development-azure
+    branches: [ main, development, development-azure ]
 
 jobs:
    Build_Push:
