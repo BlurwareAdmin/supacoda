@@ -1,36 +1,35 @@
-name: Django CI
+name: Docker Image CI
 
 on:
+  push:
+    branches: 
+     - development
   pull_request:
     branches: 
-      - development-azure
-      - development 
-      - main
+     - development
+
 jobs:
-  build:
-
+   Build_Push:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.9]
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-    - name: Install poetry
-      run: pipx install poetry
-    - uses: actions/setup-python@v3
-      with:
-         python-version: '3.9'
-         cache: 'poetry'
-    - run: poetry install
-    - name: Run Linting
-      run: |
-         poetry add black 
-         poetry run black .
-    - name: Run Tests
-      run: |
-         poetry run python manage.py test
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/supacoda:latest
+       
         
         
