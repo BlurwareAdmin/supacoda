@@ -27,10 +27,7 @@ jobs:
           cache: 'poetry'
       - run: poetry install
       - run: |
-          try: \
-            pulumi stack select ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }} \
-          except: \
-            pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}
+          pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}${{ steps.date.outputs.date }} 
           pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
           pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
           pulumi config set azure-native:tenantId ${{ secrets.ARM_TENANT_ID }} 
@@ -41,6 +38,9 @@ jobs:
         env: 
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       - run: pulumi destory --yes
+        env: 
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      - run: pulumi stack rm 
         env: 
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
