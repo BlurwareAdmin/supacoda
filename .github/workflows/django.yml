@@ -20,16 +20,16 @@ jobs:
     - name: Install poetry
       run: pipx install poetry
     - uses: actions/setup-python@v3
-       with:
+      with:
          python-version: '3.9'
          cache: 'poetry'
     - run: poetry install
     - name: Run Linting
-       run: |
+      run: |
          poetry add black 
          poetry run black .
     - name: Run Tests
-       run: |
+      run: |
          poetry run python manage.py test
         
         
