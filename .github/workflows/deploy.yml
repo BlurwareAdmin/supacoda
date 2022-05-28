@@ -25,6 +25,7 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'poetry'
+      - run: poetry install
       - run: |
           pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}${{ steps.date.outputs.date }} 
           pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
