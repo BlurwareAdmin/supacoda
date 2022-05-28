@@ -12,8 +12,9 @@ COPY pyproject.toml start-server.sh /opt/app/
 COPY . /opt/app
 WORKDIR /opt/app
 RUN pip install poetry 
-RUN poetry install \
-    && poetry run python manage.py migrate
+RUN poetry install
+RUN poetry run python manage.py migrate
+
 RUN chown -R www-data:www-data /opt/app
 
 EXPOSE 8020

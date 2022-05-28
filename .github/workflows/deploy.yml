@@ -2,11 +2,9 @@ name: CD
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [  development, development-pulumi ]
+  # Triggers the workflow on pull request events but only for the main branch
   pull_request:
-    branches: [ main, development, development-pulumi ]
+    branches: [ main, development, development-azure ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -17,26 +15,29 @@ jobs:
   Preview:
     runs-on: ubuntu-latest
     steps:
-    
-    - uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - uses: actions/checkout@v3
-    - name: Install Python Requirements
-      run: |
-        pip install -r requirements.txt
-    - name: Preview
-      run: |
-        az account list --query '[].{subscriptionName:name,subscriptionId:id}' 
-        pulumi stack select ${{ secrets.PULUMI_STACK_NAME }} 
-        pulumi config set azure-native:clientId ${{ secrets.AZURE_CLIENT_ID }} 
-        pulumi config set azure-native:clientSecret ${{ secrets.AZURE_SECRET_ID }} --secret 
-        pulumi config set azure-native:tenantId ${{ secrets.AZURE_TENANT_ID }} 
-        pulumi config set azure-native:subscriptionId ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        pulumi config set azure-native:location ${{ secrets.LOCATION }}
-        pulumi preview
-      env: 
-        PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H-%M-%S')"
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+          cache: 'poetry'
+      - run: poetry install
+      - run: |
+          poetry run pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}${{ steps.date.outputs.date }} 
+          poetry run pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
+          poetry run pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
+          poetry run pulumi config set azure-native:tenantId ${{ secrets.ARM_TENANT_ID }} 
+          poetry run pulumi config set azure-native:subscriptionId ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          poetry run pulumi config set azure-native:location eastus
+          poetry run pulumi preview
+        env: 
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN}}
+ 
+      
 
           

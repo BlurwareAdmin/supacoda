@@ -3,8 +3,8 @@
 # start-server.sh
 
 if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_PASSWORD" ] ; then
-    (python manage.py createsuperuser --no-input)
+    (poetry run python manage.py createsuperuser --no-input)
 fi
 
-(gunicorn frontend.wsgi --user www-data --bind 0.0.0.0:8010 --workers 3) &
+(poetry run gunicorn frontend.wsgi --user www-data --bind 0.0.0.0:8010 --workers 3) &
 nginx -g "daemon off;"
