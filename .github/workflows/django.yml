@@ -4,6 +4,7 @@ on:
   push:
     branches: 
      - development
+     - development-azure
   pull_request:
     branches: 
      - development
