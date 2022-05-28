@@ -26,7 +26,6 @@ jobs:
           python-version: '3.9'
           cache: 'poetry'
       - run: poetry install
-      - run: poetry run pytest
       - run: |
           try: 
             pulumi stack select ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}
