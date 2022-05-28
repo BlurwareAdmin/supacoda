@@ -5,6 +5,7 @@ on:
     branches: 
      - main
      - development
+     - development-azure
 
 jobs:
    Build_Push:
