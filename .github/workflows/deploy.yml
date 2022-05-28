@@ -19,12 +19,19 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%dT%H-%M-%S')"
       - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
       - uses: actions/setup-python@v3
         with:
           python-version: '3.9'
-          cache: 'pip'
+          cache: 'poetry'
+      - run: poetry install
+      - run: poetry run pytest
       - run: |
-          pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}${{ steps.date.outputs.date }} 
+          try: 
+            pulumi stack select ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}
+          except: 
+            pulumi stack init ${{ secrets.PULUMI_ORG }}/${{ secrets.PULUMI_STACK_NAME }}
           pulumi config set azure-native:clientId ${{ secrets.ARM_CLIENT_ID }} 
           pulumi config set azure-native:clientSecret ${{ secrets.ARM_CLIENT_SECRET }} --secret 
           pulumi config set azure-native:tenantId ${{ secrets.ARM_TENANT_ID }} 
