@@ -34,7 +34,6 @@ jobs:
           poetry run pulumi config set azure-native:subscriptionId ${{ secrets.ARM_SUBSCRIPTION_ID }}
           poetry run pulumi config set azure-native:location eastus
           poetry run pulumi preview
-          poetry run pulumi up --yes
         env: 
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN}}
